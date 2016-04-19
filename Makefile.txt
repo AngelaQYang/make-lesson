@@ -1,21 +1,23 @@
-analysis.zip : *.dat
+WORD_SCRIPT = wordcount.py
+TXT_FILES = $(wildcard books/*.txt)
+DAT_FILES=$(patsubset books/%.txt, %.bat, $(TXT_FILES))
+
+analysis.zip : $(DAT_FILES) $(WORD_SCRIPT)
 	zip $@ $^
 
+.PHONY : variables
+variables : 
+	echo TXT_FILES: $(TXT_FILES)
+	echo DAT_FILES: $(DAT_FILES)
+	
 .PHONY : dats
-dats : isles.dat abyss.dat last.dat
+dats : $(DAT_FILES)
 
 # count words
-isles.dat : books/isles.txt wordcount.py
-	python wordcount.py $< $@
+%.dat : books/%.txt $(WORD_SCRIPT)
+	python $(WORD_SCRIPT) $< $*.dat
 	
-abyss.dat : books/abyss.txt wordcount.py
-	python wordcount.py $< $@
-	
-last.dat : books/last.txt wordcount.py
-	python wordcount.py $< $@
-	
-
-	
-.PHONY : Clean	
+.PHONY : clean	
 clean : 
-	rm -f *.dat *.zip
+	rm -f $(DAT_FILES)
+	rm -f analysis.zip
